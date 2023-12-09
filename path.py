@@ -1,1 +1,1 @@
-LOCAL_PATH = "D:\\УЧЁБА\\4 курс\\7 сем\\physiological_indicators_analisis_app"
+LOCAL_PATH = "C:\Users\vkurd\source\repos\Learn\Polina\physiological_indicators_analisis_app"
