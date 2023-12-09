@@ -11,22 +11,22 @@ class CaloriesModule:
     def __init__(self, user: User):
         self.user = user
 
-    def __add_consumed_calories(self, calories: int, current_date: date):
+    def __add_consumed_calories(self, calories: int, current_date: str):
         data = {'user_id': self.user.name,
-                'calories_consumed': calories,
+                'calories': calories,
                 'date': current_date}
         calories_old = ds.get_food_intake_by_day(self.user.name, current_date)
         if calories_old != 0:
             data['calories'] += calories_old
         ds.try_insert_calories(data, 'UserFoodIntake')
 
-    def __add_burned_calories(self, calories: int, current_date: date):
+    def __add_burned_calories(self, calories: int, current_date: str):
         data = {'user_id': self.user.name,
                 'calories': calories,
                 'date': current_date}
         calories_old = ds.get_calories_burned_by_day(self.user.name, current_date)
         if calories_old != 0:
-            data['calories_burned'] += calories_old
+            data['calories'] += calories_old
         ds.try_insert_calories(data, 'UserTraining')
 
     def __count_calories_intake_by_ingredients(self, ingredients: dict[str, int]):
@@ -42,15 +42,15 @@ class CaloriesModule:
         for exercise in exercises:
             exercise_calories_per_10min = ds.get_calories_by_exercise(exercise)
             calories += exercise_calories_per_10min / 10 * exercises[exercise]
-        return math.ceil(calories) + 1500
+        return math.ceil(calories)
 
     # MAIN вставка данных потребленные калории( + расчёт)
-    def set_calories_intake(self, current_date: date, ingredients: dict[str, int]):
+    def set_calories_intake(self, current_date: str, ingredients: dict[str, int]):
         calories = self.__count_calories_intake_by_ingredients(ingredients)
         self.__add_consumed_calories(calories, current_date)
 
     # MAIN вставка данных потраченных за день калории ( + расчет)
-    def set_calories_outcome(self, current_date: date, exercises: dict[str, int]):
+    def set_calories_outcome(self, current_date: str, exercises: dict[str, int]):
         calories = self.__count_calories_outcome_by_exercises(exercises)
         self.__add_burned_calories(calories, current_date)
 
@@ -89,6 +89,5 @@ class CaloriesModule:
 if __name__ == "__main__":
     user = User("polina.vngrd", 56, 169, 20, False)
     module = CaloriesModule(user)
-    res = module.create_daily_report()
-    print(res)
 
+# TODO добавить функции добавления упражнения и ингредиента

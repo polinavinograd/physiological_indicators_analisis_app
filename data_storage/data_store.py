@@ -120,14 +120,17 @@ class IndicatorsDataStorage:
                 WHERE user_id = ? AND date = ?
             """
         self.cursor.execute(query, (user_id, current_date))
-        return self.cursor.fetchone()[0]
+        result = self.cursor.fetchone()
+        return result[0]
 
-    def get_calories_burned_by_day(self, user_id: str, current_date: date) -> int:
+    def get_calories_burned_by_day(self, user_id: str, current_date: str) -> int:
         query = f"""
                 SELECT IFNULL(calories, 0)
                 FROM UserTraining
                 WHERE user_id = ? AND date = ?
             """
+        print(user_id)
+        print(current_date)
         self.cursor.execute(query, (user_id, current_date))
         return self.cursor.fetchone()[0]
 
@@ -181,12 +184,14 @@ class IndicatorsDataStorage:
             existing_data = self.cursor.fetchone()
 
             if existing_data:
-                self.cursor.execute(f"UPDATE {table_name} SET calories = calories + ? WHERE user_id = ? AND date = ?",
+                self.cursor.execute(f"UPDATE {table_name} SET calories = ? WHERE user_id = ? AND date = ?",
                                     (calories, user_id, current_date))
                 self.db_connection.commit()
             else:
                 columns = ', '.join(data.keys())
                 placeholders = ', '.join('?' for _ in data.values())
+                if table_name == "UserTraining":
+                    data['calories'] += 1500
                 self.cursor.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})",
                                     tuple(data.values()))
                 self.db_connection.commit()
