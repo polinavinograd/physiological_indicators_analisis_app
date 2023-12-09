@@ -3,8 +3,9 @@ import os
 
 
 def date_range(start_date, end_date):
-    start_date = datetime.strptime(start_date, "%Y-%m-%d")
-    end_date = datetime.strptime(end_date, "%Y-%m-%d")
+    if isinstance(start_date, str) and isinstance(end_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
 
     current_date = start_date
     while current_date <= end_date:
