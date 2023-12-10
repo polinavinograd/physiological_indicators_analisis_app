@@ -7,6 +7,11 @@ from kivymd.uix.menu import MDDropdownMenu
 from model.user import User
 
 KV = '''
+<DrawerClickableItem@MDNavigationDrawerItem>
+    text_color: 1, 1, 1, 1
+    # focus_color: "#e7e4c0"
+    # ripple_color: "#c5bdd2"
+
 MDScreen:
     screen_manager: screen_manager
     nav_drawer: nav_drawer
@@ -32,10 +37,35 @@ MDScreen:
 
             UserInfoScreen:
                 name: "src_user_info"
+                    
+            MDScreen:
+                name: "scr_stress_screen"
 
                 MDLabel:
-                    text: "User info"
+                    text: "Информация о стрессе"
                     halign: "center"
+                    
+            MDScreen:
+                name: "scr_nutritions_screen"
+
+                MDLabel:
+                    text: "Информация о приеме пищи"
+                    halign: "center"
+                    
+            MDScreen:
+                name: "scr_fitness_screen"
+
+                MDLabel:
+                    text: "Информация о проведенной тренировке"
+                    halign: "center"
+                    
+            MDScreen:
+                name: "scr_menstruation_screen"
+
+                MDLabel:
+                    text: "Информация о месячном цикле"
+                    halign: "center"
+
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -46,12 +76,40 @@ MDScreen:
                 screen_manager: screen_manager
                 nav_drawer: nav_drawer
 
-                MDNavigationDrawerItem:
+                DrawerClickableItem:
                     icon: "account-box-outline"
                     text: "Мои данные"
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "src_user_info"
+
+                DrawerClickableItem:
+                    icon: "alert-outline"
+                    text: "Стресс"
+                    on_press:
+                        root.nav_drawer.set_state("close")
+                        root.screen_manager.current = "scr_stress_screen"
+
+                DrawerClickableItem:
+                    icon: "alert-outline"
+                    text: "Питание"
+                    on_press:
+                        root.nav_drawer.set_state("close")
+                        root.screen_manager.current = "scr_nutritions_screen"
+
+                DrawerClickableItem:
+                    icon: "alert-outline"
+                    text: "Тренировки"
+                    on_press:
+                        root.nav_drawer.set_state("close")
+                        root.screen_manager.current = "scr_fitness_screen"
+
+                DrawerClickableItem:
+                    icon: "alert-outline"
+                    text: "Месячный цикл"
+                    on_press:
+                        root.nav_drawer.set_state("close")
+                        root.screen_manager.current = "scr_menstruation_screen"
 
 <UserInfoScreen>:
     MDBoxLayout:
