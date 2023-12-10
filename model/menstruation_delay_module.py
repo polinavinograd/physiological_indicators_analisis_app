@@ -1,8 +1,8 @@
-import pandas as pd
-import joblib
+import numpy as np
+from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_squared_error
 
 from model.user import User
 from model.stress_module import StressModule
@@ -14,8 +14,25 @@ class MenstruationDelayModule:
         self.user = user
         self.stress_module = sm
         self.ds = ds
-        data = self.__form_training_data(self.__get_menstrual_info())
+        self.current_cycle = [[{}]]
+
+        data = self.__form_training_data(self.__get_menstrual_info())[:10]
+        self.normal_cycle_length = min([el['cycle_length'] for el in data])
+        X = self.__create_np_array(data)
+        y = np.array([d['cycle_length'] for d in data])
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        self.model = LinearRegression()
+        self.model.fit(X_train, y_train)
+        y_pred = self.model.predict(X_test)
+
+        mse = mean_squared_error(y_test, y_pred)
+        print(f'Mean Squared Error: {mse}')
         print("\033[91mMenstruationDelayModule created! \033[0m")
+
+    def __create_np_array(self, data: list[dict]) -> np.array:
+        X = np.array([[d['abdominal_pain'], d['digestive_disorders'], d['breast_pain'], d['skin_rash'], d['bad_mood'],
+                       d['neutral_mood'], d['good_mood'], d['stress']] for d in data])
+        return X
 
     def __get_menstrual_info(self):
         return self.ds.get_menstual_info(self.user.name)
@@ -48,16 +65,16 @@ class MenstruationDelayModule:
             cycles.append(cycle)
         return cycles
 
-    def __count_entries(self, indicator_str: str, indicator_int: int, data: list[dict]):
+    def __count_entries(self, indicator_str: str, indicator_int: int, data: list[dict]) -> int:
         return sum(1 for entry in data if entry[indicator_str] == indicator_int)
 
-    def __get_start_date_of_cycle(self, data: list[dict]):
+    def __get_start_date_of_cycle(self, data: list[dict]) -> str:
         return data[0]["date"]
 
-    def __get_end_date_of_cycle(self, data: list[dict]):
+    def __get_end_date_of_cycle(self, data: list[dict]) -> str:
         return data[-1]["date"]
 
-    def __split_data_into_cycles(self, data: list[dict]):
+    def __split_data_into_cycles(self, data: list[dict]) -> list[list[dict]]:
         new_list = []
         for string in data:
             new_list.append(string['menstruation_status'])
@@ -70,7 +87,7 @@ class MenstruationDelayModule:
             start += len(cycle)
         return result_cycles
 
-    def __form_temp_test_data(self, result_cycles: list[list[dict]]):
+    def __form_temp_test_data(self, result_cycles: list[list[dict]]) -> list[dict]:
         cycles = []
         for cycle in result_cycles:
             abdominal_pain_counter = self.__count_entries('abdominal_pain', 1, cycle)
@@ -95,27 +112,22 @@ class MenstruationDelayModule:
 
     def __form_training_data(self, data: list[tuple]) -> list[dict]:
         data = self.__split_data_into_cycles(self.__convert_tuples_to_list_of_dicts(data))
+        self.current_cycle = [data[-1]]
         res = self.__form_temp_test_data(data)
         return res
 
-    # def __init__(self, data: dict[str: list[int]]):
-    #     try:
-    #         self.model = joblib.load('menstruation_delay_pretrained_model.joblib')
-    #     except (FileNotFoundError, EOFError, Exception):
-    #         df = pd.DataFrame(data)
-    #
-    #         x = df[['cycle', 'stress']]
-    #         y = df['delay']
-    #
-    #         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-    #
-    #         self.model = LinearRegression()
-    #         self.model.fit(x_train, y_train)
-    #         joblib.dump(self.model, 'menstruation_delay_pretrained_model.joblib')
-    #
-    #         test_predictions = self.model.predict(x_test)
-    #         self.accuracy = accuracy_score(y_test, test_predictions)
-    #
-    # def predict_delay_of_menstruation(self, test_data: dict[str, list[int]]) -> int:
-    #     predictions = self.model.predict(test_data)
-    #     return predictions
+    # MAIN predict date
+    def predict_menstruation(self) -> str:
+        data = self.__form_temp_test_data(self.current_cycle)
+        start_date = self.__get_start_date_of_cycle(self.current_cycle[0])
+        data = self.__create_np_array(data)
+        res_length = round(self.model.predict(data)[0])
+        if res_length < self.normal_cycle_length:
+            res_length = self.normal_cycle_length
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        res = start_date + timedelta(days=res_length)
+        return res.strftime("%Y-%m-%d")
+
+    def set_menstruation_data(self, data: dict):
+        self.ds.insert_menstruation_data(data)
+

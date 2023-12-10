@@ -217,5 +217,29 @@ class IndicatorsDataStorage:
         query = f"INSERT INTO UserStress ({columns}) VALUES ({values})"
         self.cursor.execute(query, tuple(data.values()))
 
+    def insert_menstruation_data(self, data: dict):
+        existing_query = f"SELECT 1 FROM UserMenstruation WHERE user_id = ? AND date = ?"
+        user_id, current_date = data.get('user_id'), data.get('date')
+        try:
+            self.cursor.execute(existing_query, (user_id, current_date))
+            existing_data = self.cursor.fetchone()
+
+            if existing_data:
+                for key in data.keys():
+                    self.cursor.execute(f"UPDATE UserMenstruation SET {key} = ? WHERE user_id = ? AND date = ?",
+                                        (data[key], user_id, current_date))
+                    self.db_connection.commit()
+            else:
+                columns = ', '.join(data.keys())
+                placeholders = ', '.join('?' for _ in data.values())
+                self.cursor.execute(f"INSERT INTO UserMenstruation ({columns}) VALUES ({placeholders})",
+                                    tuple(data.values()))
+                self.db_connection.commit()
+            return True
+
+        except sqlite3.Error as e:
+            print(f"Ошибка при вставке или обновлении данных: {e}")
+            return False
+
     def close_connection(self) -> None:
         self.db_connection.close()

@@ -18,6 +18,8 @@ class MyApp:
         self.stress_module = StressModule(self.user, self.data_storage)
         self.calories_module = CaloriesModule(self.user, self.data_storage)
         self.menstruation_module = MenstruationDelayModule(self.user, self.stress_module, self.data_storage)
+        res = self.menstruation_module.predict_menstruation()
+        print(res)
 
 
 if __name__ == "__main__":
