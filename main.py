@@ -1,12 +1,43 @@
 ﻿from kivy.lang import Builder
-
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
-
+from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
 from model.user import User
 
 KV = '''
+<BoxLayoutBelowToolbar@MDBoxLayout>
+    orientation: 'vertical'
+    pos_hint: {'top': 0.9}
+    size_hint: 1, 0.9
+    canvas.before:
+        Color:
+            rgba: 255, 0, 0, 1
+        Line:
+            width:
+            rectangle: self.x, self.y, self.width, self.height
+
+<CheckBoxWithText@MDBoxLayout>
+    orientation: 'horizontal'
+    canvas.before:
+        Color:
+            rgba: 255, 0, 0, 1
+        Line:
+            width:
+            rectangle: self.x, self.y, self.width, self.height
+
+    MDCheckbox:
+        id: checkbox
+        size_hint: 0.1, 1
+
+    MDLabel:
+        text: root.label_text
+        size_hint: 0.9, 1
+        halign: 'left'
+        valign: 'middle'
+
 <DrawerClickableItem@MDNavigationDrawerItem>
     text_color: 1, 1, 1, 1
     # focus_color: "#e7e4c0"
@@ -19,6 +50,7 @@ MDScreen:
     # Объявлен вне навигации, чтобы присутствовал на каждом экране
     MDTopAppBar:
         pos_hint: {"top": 1}
+        size_hint: 1, 0.1 
         elevation: 4
         title: "Мое приложение"
         left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
@@ -59,13 +91,8 @@ MDScreen:
                     text: "Информация о проведенной тренировке"
                     halign: "center"
                     
-            MDScreen:
+            AddMenstruationInfoScreen:
                 name: "scr_menstruation_screen"
-
-                MDLabel:
-                    text: "Информация о месячном цикле"
-                    halign: "center"
-
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -167,7 +194,33 @@ MDScreen:
             text: 'Обновить'
             on_release: root.save_user_data()
 
+<AddMenstruationInfoScreen>:
+    BoxLayoutBelowToolbar:
+        MDStackLayout:            
+            CheckBoxWithText:
+                size_hint: 1, 0.2
+                label_text: 'Есть ли месячные?'
 
+        # MDBoxLayout:
+        #     orientation: 'horizontal'
+        #     size_hint: 1, 0.5
+                # pos_hint: { "left": 0 }         
+
+            # MDBoxLayout:
+            #     orientation: 'vertical'
+            #     id: symptoms_list
+                    # Add checkboxes for symptoms in Python code
+
+                # MDBoxLayout:
+                #     orientation: 'horizontal'
+                #     MDLabel:
+                #         text: 'Mood:'
+                #         size_hint_x: None
+                #         width: dp(100)
+                #     MDTextField:
+                #         id: mood_field
+                #         readonly: True
+                #         on_focus: if self.focus: app.open_mood_menu(self)
 '''
 
 class UserInfoScreen(MDScreen):
@@ -181,6 +234,12 @@ class UserInfoScreen(MDScreen):
     
     def save_user_data(self):
         pass
+    
+class AddMenstruationInfoScreen(MDScreen):
+    pass
+
+class CheckBoxWithText(MDBoxLayout):
+    label_text = StringProperty('')
 
 class Example(MDApp):
     def build(self):
