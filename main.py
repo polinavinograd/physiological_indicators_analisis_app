@@ -3,12 +3,78 @@ from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.selection import MDSelectionList
+from kivymd.uix.scrollview import MDScrollView
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from model.user import User
+from kivymd.uix.list import TwoLineAvatarListItem
+from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
+from kivymd.uix.selectioncontrol import MDCheckbox
+from abc import ABC, abstractmethod
+
+KVTest = '''
+<SelectableListItem@OneLineAvatarIconListItem>:
+    checkbox: checkbox
+
+    ListItemCheckbox:
+        id: checkbox
+    
+
+<SelectableList@MDScrollView>:
+    
+    MDList:
+        id: list_items
+
+SelectableList:
+    id: selectable_list
+'''
+
+class IListItem(ABC):
+    @property
+    def id(self) -> int:
+        return self._id
+    
+    @id.setter
+    def id(self, id: int):
+        self._id = id
+
+    @abstractmethod
+    def set_selected(self, is_selected: bool):
+        pass
+
+class SelectableListItem(OneLineAvatarIconListItem):
+    checkbox = ObjectProperty(None)
+
+    @property
+    def item(self) -> IListItem:
+        return self.__item
+    
+    @item.setter
+    def item(self, item: IListItem):
+        self.__item = item
+        self.checkbox.item = item
+
+class ListItemCheckbox(IRightBodyTouch, MDCheckbox):
+    @property
+    def item(self) -> IListItem:
+        return self.__item
+    
+    @item.setter
+    def item(self, item: IListItem):
+        self.__item = item
+
+    def on_active(self, something, is_selected: bool):
+        self.item.set_selected(is_selected)
+
+class SelectableList(MDScrollView):
+    def add_item(self, text: str, item: IListItem):
+        self.root.ids.list_items.add_widget(SelectableListItem(item=item, text=text))
+    
+
 
 KV = '''
-<BoxLayoutBelowToolbar@MDBoxLayout>
+<BoxLayoutBelowToolbar@MDBoxLayout>:
     orientation: 'vertical'
     pos_hint: {'top': 0.9}
     size_hint: 1, 0.9
@@ -19,7 +85,7 @@ KV = '''
             width:
             rectangle: self.x, self.y, self.width, self.height
 
-<CheckBoxWithText@MDBoxLayout>
+<CheckBoxWithText@MDBoxLayout>:
     orientation: 'horizontal'
     canvas.before:
         Color:
@@ -38,7 +104,11 @@ KV = '''
         halign: 'left'
         valign: 'middle'
 
-<DrawerClickableItem@MDNavigationDrawerItem>
+<SelectableList@MDSelectionList>:
+    on_selected: self.on_selected(*args)
+    on_unselected: self.on_unselected(*args)
+
+<DrawerClickableItem@MDNavigationDrawerItem>:
     text_color: 1, 1, 1, 1
     # focus_color: "#e7e4c0"
     # ripple_color: "#c5bdd2"
@@ -201,6 +271,11 @@ MDScreen:
                 size_hint: 1, 0.2
                 label_text: 'Есть ли месячные?'
 
+            ScrollView:
+                SelectableList:
+                    size_hint: 1, 1
+                    id: selected
+
         # MDBoxLayout:
         #     orientation: 'horizontal'
         #     size_hint: 1, 0.5
@@ -221,7 +296,15 @@ MDScreen:
                 #         id: mood_field
                 #         readonly: True
                 #         on_focus: if self.focus: app.open_mood_menu(self)
+
+<MyItem>
+    text: "Two-line item with avatar"
+    secondary_text: "Secondary text here"
+    _no_ripple_effect: True
 '''
+
+class MyItem(TwoLineAvatarListItem):
+    pass
 
 class UserInfoScreen(MDScreen):
     def __init__(self, *args, **kwargs):
@@ -241,11 +324,48 @@ class AddMenstruationInfoScreen(MDScreen):
 class CheckBoxWithText(MDBoxLayout):
     label_text = StringProperty('')
 
+# class SelectableListItem(MDBoxLayout):
+#     text = StringProperty('')
+
+
+    
+#     def on_checkbox_active(self, checkbox, value):
+#         # Handle the checkbox toggle event
+#         if value:
+#             print(f"Selected: {self.text}")
+#         else:
+#             print(f"Unselected: {self.text}")
+
+# class SelectableList(MDScrollView):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for i in range(10):
+#             self.ids.list_container.add_widget(SelectableListItem(text="THE BUTTON"))
+
+
+
+class ListItem(IListItem):
+    @property
+    def id(self) -> int:
+        return self._id
+    
+    @id.setter
+    def id(self, id: int):
+        self._id = id
+
+    def set_selected(self, is_selected: bool):
+        print(f"Item {self.id} selected!")
+
 class Example(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Orange"
         self.theme_cls.theme_style = "Dark"
-        return Builder.load_string(KV)
+        return Builder.load_string(KVTest)
+    
+    def on_start(self):
+        selectable_list = self.root.ids.selectable_list
+        for i in range(30):
+            selectable_list.add_item(f"Item {i}", ListItem(id=i))
 
 
 Example().run()
