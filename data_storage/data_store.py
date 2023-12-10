@@ -15,11 +15,12 @@ class IndicatorsDataStorage:
         if len(self.cursor.execute("SELECT * "
                                    "FROM sqlite_master "
                                    "WHERE type='table' AND name NOT LIKE 'sqlite_%';").fetchall()) < 7:
-            self.initialize_db()
+            self.__initialize_db()
             for table_name in table_names:
                 self.__load_data_from_xlsx(table_name + ".xlsx")
+        print("\033[91mDataStorage created! \033[0m")
 
-    def initialize_db(self) -> None:
+    def __initialize_db(self) -> None:
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS Users (
                 user_id CHAR PRIMARY KEY,
@@ -134,6 +135,15 @@ class IndicatorsDataStorage:
         self.cursor.execute(query, (user_id, current_date))
         return self.cursor.fetchone()[0]
 
+    def get_menstual_info(self, user_id: str):
+        query = f"""
+                SELECT *
+                FROM UserMenstruation
+                WHERE user_id = ?
+            """
+        self.cursor.execute(query, (user_id,))
+        return self.cursor.fetchall()
+
     def __load_data_from_xlsx(self, xlsx_file: str) -> None:
         df = pd.read_excel(os.path.join(LOCAL_PATH, "data_storage/excel_db", xlsx_file), parse_dates=True)
 
@@ -201,8 +211,11 @@ class IndicatorsDataStorage:
             print(f"Ошибка при вставке или обновлении данных: {e}")
             return False
 
+    def insert_stress_data(self, data: dict):
+        columns = ', '.join(data.keys())
+        values = ', '.join('?' for _ in data.values())
+        query = f"INSERT INTO UserStress ({columns}) VALUES ({values})"
+        self.cursor.execute(query, tuple(data.values()))
+
     def close_connection(self) -> None:
         self.db_connection.close()
-
-
-ds = IndicatorsDataStorage()

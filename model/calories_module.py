@@ -2,37 +2,39 @@ import math
 from datetime import date, timedelta
 
 from utils import date_range
-from data_storage.data_store import ds
+from data_storage.data_store import IndicatorsDataStorage
 from model.calorie_report import CalorieReport
 from model.user import User
 
 
 class CaloriesModule:
-    def __init__(self, user: User):
+    def __init__(self, user: User, ds: IndicatorsDataStorage):
         self.user = user
+        self.ds = ds
+        print("\033[91mCaloriesModule created! \033[0m")
 
     def __add_consumed_calories(self, calories: int, current_date: str):
         data = {'user_id': self.user.name,
                 'calories': calories,
                 'date': current_date}
-        calories_old = ds.get_food_intake_by_day(self.user.name, current_date)
+        calories_old = self.ds.get_food_intake_by_day(self.user.name, current_date)
         if calories_old != 0:
             data['calories'] += calories_old
-        ds.try_insert_calories(data, 'UserFoodIntake')
+        self.ds.try_insert_calories(data, 'UserFoodIntake')
 
     def __add_burned_calories(self, calories: int, current_date: str):
         data = {'user_id': self.user.name,
                 'calories': calories,
                 'date': current_date}
-        calories_old = ds.get_calories_burned_by_day(self.user.name, current_date)
+        calories_old = self.ds.get_calories_burned_by_day(self.user.name, current_date)
         if calories_old != 0:
             data['calories'] += calories_old
-        ds.try_insert_calories(data, 'UserTraining')
+        self.ds.try_insert_calories(data, 'UserTraining')
 
     def __count_calories_intake_by_ingredients(self, ingredients: dict[str, int]):
         calories = 0
         for ingredient in ingredients:
-            ingredient_calories_per_100g = ds.get_calories_by_ingredient(ingredient)
+            ingredient_calories_per_100g = self.ds.get_calories_by_ingredient(ingredient)
             calories += ingredient_calories_per_100g / 100 * ingredients[ingredient]
         return math.ceil(calories)
 
@@ -40,7 +42,7 @@ class CaloriesModule:
     def __count_calories_outcome_by_exercises(self, exercises: dict[str, int]):
         calories = 0
         for exercise in exercises:
-            exercise_calories_per_10min = ds.get_calories_by_exercise(exercise)
+            exercise_calories_per_10min = self.ds.get_calories_by_exercise(exercise)
             calories += exercise_calories_per_10min / 10 * exercises[exercise]
         return math.ceil(calories)
 
@@ -59,7 +61,7 @@ class CaloriesModule:
         week_start_date = current_date - timedelta(days=6)
         calories = []
         for day in date_range(week_start_date, current_date):
-            calories.append(ds.get_calories_burned_by_day(self.user.name, day))
+            calories.append(self.ds.get_calories_burned_by_day(self.user.name, day))
         active_days_count = sum(1 for value in calories if value > 1800)
         if active_days_count == 0:
             return 1.2
@@ -80,14 +82,9 @@ class CaloriesModule:
     def create_daily_report(self):
         current_date = date.today()
         daily_norm = self.__count_daily_calories_norm()
-        calories_consumed = ds.get_food_intake_by_day(self.user.name, current_date)
-        calories_burned = ds.get_calories_burned_by_day(self.user.name, current_date)
+        calories_consumed = self.ds.get_food_intake_by_day(self.user.name, current_date)
+        calories_burned = self.ds.get_calories_burned_by_day(self.user.name, current_date)
         report = CalorieReport(self.user, current_date, calories_consumed, calories_burned, daily_norm).report
         return report
-
-
-if __name__ == "__main__":
-    user = User("polina.vngrd", 56, 169, 20, False)
-    module = CaloriesModule(user)
 
 # TODO добавить функции добавления упражнения и ингредиента
