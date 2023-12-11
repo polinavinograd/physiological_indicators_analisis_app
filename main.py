@@ -12,23 +12,7 @@ from kivymd.uix.list import TwoLineAvatarListItem
 from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from abc import ABC, abstractmethod
-
-KVTest = '''
-<SelectableListItem@OneLineAvatarIconListItem>:
-    checkbox: checkbox
-
-    ListItemCheckbox:
-        id: checkbox
-    
-
-<SelectableList@MDScrollView>:
-    
-    MDList:
-        id: list_items
-
-SelectableList:
-    # id: selectable_list
-'''
+from kivy.clock import Clock
 
 class IListItem(ABC):
     @property
@@ -82,12 +66,6 @@ KV = '''
     orientation: 'vertical'
     pos_hint: {'top': 0.9}
     size_hint: 1, 0.9
-    canvas.before:
-        Color:
-            rgba: 255, 0, 0, 1
-        Line:
-            width:
-            rectangle: self.x, self.y, self.width, self.height
 
 <CheckBoxWithText@MDBoxLayout>:
     orientation: 'horizontal'
@@ -108,9 +86,29 @@ KV = '''
         halign: 'left'
         valign: 'middle'
 
-<SelectableList@MDSelectionList>:
-    on_selected: self.on_selected(*args)
-    on_unselected: self.on_unselected(*args)
+<SelectableListItem@OneLineAvatarIconListItem>:
+    checkbox: checkbox
+
+    ListItemCheckbox:
+        id: checkbox
+    
+<SelectableList@MDScrollView>:
+    
+    MDList:
+        id: list_items
+        
+<RadioButtonWithText@MDBoxLayout>:
+    MDCheckbox:
+        id: checkbox
+        group: 'group'
+        size_hint: 0.2, 1
+        pos_hint: {'center_x': .5, 'center_y': .5}
+
+    MDLabel:
+        text: root.label_text
+        size_hint: 0.8, 1
+        halign: 'left'
+        valign: 'middle'
 
 <DrawerClickableItem@MDNavigationDrawerItem>:
     text_color: 1, 1, 1, 1
@@ -269,37 +267,84 @@ MDScreen:
             on_release: root.save_user_data()
 
 <AddMenstruationInfoScreen>:
+    selectable_list: selectable_list
+
     BoxLayoutBelowToolbar:
+
         MDStackLayout:            
             CheckBoxWithText:
                 size_hint: 1, 0.2
                 label_text: 'Есть ли месячные?'
 
-            ScrollView:
+            MDBoxLayout:
+                size_hint: 1, 0.07   
+
+                MDLabel:    
+                    size_hint: 0.6, 1            
+                    halign: 'left'
+                    valign: 'middle'
+                    text: 'Симптомы'
+                    padding: dp(30)
+                    canvas.before:
+                        Color:
+                            rgba: 255, 0, 0, 1
+                        Line:
+                            width:
+                            rectangle: self.x, self.y, self.width, self.height
+                            
+                MDLabel:
+                    size_hint: 0.4, 1               
+                    padding: dp(20)
+                    halign: 'left'
+                    valign: 'middle'
+                    text: 'Настроение'
+                    canvas.before:
+                        Color:
+                            rgba: 255, 0, 0, 1
+                        Line:
+                            width:
+                            rectangle: self.x, self.y, self.width, self.height
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1, 0.63 
+
                 SelectableList:
-                    size_hint: 1, 1
-                    id: selected
+                    id: selectable_list
+                    size_hint: 0.6, 1 
+                    canvas.before:
+                        Color:
+                            rgba: 255, 0, 0, 1
+                        Line:
+                            width:
+                            rectangle: self.x, self.y, self.width, self.height
+                
+                MDBoxLayout:
+                    size_hint: 0.4, 1 
+                    orientation: 'vertical'
 
-        # MDBoxLayout:
-        #     orientation: 'horizontal'
-        #     size_hint: 1, 0.5
-                # pos_hint: { "left": 0 }         
+                    RadioButtonWithText:
+                        label_text: 'Веселое'
+                        active: True
+                        group: 'group'
+                    
+                    RadioButtonWithText:
+                        label_text: 'Спокойное'
+                        active: True
+                        group: 'group'
+                    
+                    RadioButtonWithText:
+                        label_text: 'Грустное'
+                        active: True
+                        group: 'group'
 
-            # MDBoxLayout:
-            #     orientation: 'vertical'
-            #     id: symptoms_list
-                    # Add checkboxes for symptoms in Python code
+            MDBoxLayout:
+                size_hint: 1, 0.1
+                padding: 10
 
-                # MDBoxLayout:
-                #     orientation: 'horizontal'
-                #     MDLabel:
-                #         text: 'Mood:'
-                #         size_hint_x: None
-                #         width: dp(100)
-                #     MDTextField:
-                #         id: mood_field
-                #         readonly: True
-                #         on_focus: if self.focus: app.open_mood_menu(self)
+                MDRaisedButton:
+                    text: "Сохранить"
+                    on_press: root.save_data()
 
 <MyItem>
     text: "Two-line item with avatar"
@@ -323,30 +368,19 @@ class UserInfoScreen(MDScreen):
         pass
     
 class AddMenstruationInfoScreen(MDScreen):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        Clock.schedule_once(self.setup_widgets)
 
-class CheckBoxWithText(MDBoxLayout):
+    def setup_widgets(self, dt):
+        for i in range(30):
+            self.ids.selectable_list.add_item(f"Item {i}", ListItem(id=i))
+
+    def save_data(self):
+        pass
+
+class RadioButtonWithText(MDBoxLayout):
     label_text = StringProperty('')
-
-# class SelectableListItem(MDBoxLayout):
-#     text = StringProperty('')
-
-
-    
-#     def on_checkbox_active(self, checkbox, value):
-#         # Handle the checkbox toggle event
-#         if value:
-#             print(f"Selected: {self.text}")
-#         else:
-#             print(f"Unselected: {self.text}")
-
-# class SelectableList(MDScrollView):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         for i in range(10):
-#             self.ids.list_container.add_widget(SelectableListItem(text="THE BUTTON"))
-
-
 
 class ListItem(IListItem):
     def __init__(self, id: int) -> None:
@@ -363,21 +397,15 @@ class ListItem(IListItem):
 
     def set_selected(self, is_selected: bool):
         print(f"Item {self.id} selected!")
+        
+class CheckBoxWithText(MDBoxLayout):
+    label_text = StringProperty('')
 
 class Example(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Orange"
         self.theme_cls.theme_style = "Dark"
-        return Builder.load_string(KVTest)
-    
-    def on_start(self):
-
-        valist = SelectableList() 
-        # self.root.add_widget(valist)
-
-        # selectable_list = self.root.ids.selectable_list
-        for i in range(30):
-            self.root.add_item(f"Item {i}", ListItem(id=i))
+        return Builder.load_string(KV)
 
 
 Example().run()
