@@ -27,7 +27,7 @@ KVTest = '''
         id: list_items
 
 SelectableList:
-    id: selectable_list
+    # id: selectable_list
 '''
 
 class IListItem(ABC):
@@ -69,7 +69,11 @@ class ListItemCheckbox(IRightBodyTouch, MDCheckbox):
 
 class SelectableList(MDScrollView):
     def add_item(self, text: str, item: IListItem):
-        self.root.ids.list_items.add_widget(SelectableListItem(item=item, text=text))
+        viewItem = SelectableListItem(text=text)
+        viewItem.item = item
+
+        self.ids.list_items.add_widget(viewItem)
+        # self.root.ids.list_items.add_widget(SelectableListItem(item=item, text=text))
     
 
 
@@ -345,6 +349,10 @@ class CheckBoxWithText(MDBoxLayout):
 
 
 class ListItem(IListItem):
+    def __init__(self, id: int) -> None:
+        self.id = id
+        super().__init__()
+    
     @property
     def id(self) -> int:
         return self._id
@@ -363,9 +371,13 @@ class Example(MDApp):
         return Builder.load_string(KVTest)
     
     def on_start(self):
-        selectable_list = self.root.ids.selectable_list
+
+        valist = SelectableList() 
+        # self.root.add_widget(valist)
+
+        # selectable_list = self.root.ids.selectable_list
         for i in range(30):
-            selectable_list.add_item(f"Item {i}", ListItem(id=i))
+            self.root.add_item(f"Item {i}", ListItem(id=i))
 
 
 Example().run()
