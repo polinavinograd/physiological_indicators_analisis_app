@@ -2,63 +2,11 @@
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.selection import MDSelectionList
-from kivymd.uix.scrollview import MDScrollView
-from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from model.user import User
-from kivymd.uix.list import TwoLineAvatarListItem
-from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
-from kivymd.uix.selectioncontrol import MDCheckbox
-from abc import ABC, abstractmethod
+from views.shared_components import *
 from kivy.clock import Clock
-
-class IListItem(ABC):
-    @property
-    def id(self) -> int:
-        return self._id
-    
-    @id.setter
-    def id(self, id: int):
-        self._id = id
-
-    @abstractmethod
-    def set_selected(self, is_selected: bool):
-        pass
-
-class SelectableListItem(OneLineAvatarIconListItem):
-    checkbox = ObjectProperty(None)
-
-    @property
-    def item(self) -> IListItem:
-        return self.__item
-    
-    @item.setter
-    def item(self, item: IListItem):
-        self.__item = item
-        self.checkbox.item = item
-
-class ListItemCheckbox(IRightBodyTouch, MDCheckbox):
-    @property
-    def item(self) -> IListItem:
-        return self.__item
-    
-    @item.setter
-    def item(self, item: IListItem):
-        self.__item = item
-
-    def on_active(self, something, is_selected: bool):
-        self.item.set_selected(is_selected)
-
-class SelectableList(MDScrollView):
-    def add_item(self, text: str, item: IListItem):
-        viewItem = SelectableListItem(text=text)
-        viewItem.item = item
-
-        self.ids.list_items.add_widget(viewItem)
-        # self.root.ids.list_items.add_widget(SelectableListItem(item=item, text=text))
-    
+from kivymd.uix.pickers import MDDatePicker, MDTimePicker
 
 
 KV = '''
@@ -85,17 +33,6 @@ KV = '''
         size_hint: 0.9, 1
         halign: 'left'
         valign: 'middle'
-
-<SelectableListItem@OneLineAvatarIconListItem>:
-    checkbox: checkbox
-
-    ListItemCheckbox:
-        id: checkbox
-    
-<SelectableList@MDScrollView>:
-    
-    MDList:
-        id: list_items
         
 <RadioButtonWithText@MDBoxLayout>:
     MDCheckbox:
@@ -142,12 +79,8 @@ MDScreen:
             UserInfoScreen:
                 name: "src_user_info"
                     
-            MDScreen:
+            AddStressScreen:
                 name: "scr_stress_screen"
-
-                MDLabel:
-                    text: "Информация о стрессе"
-                    halign: "center"
                     
             MDScreen:
                 name: "scr_nutritions_screen"
@@ -184,7 +117,7 @@ MDScreen:
 
                 DrawerClickableItem:
                     icon: "alert-outline"
-                    text: "Стресс"
+                    text: "Добавить стресс"
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_stress_screen"
@@ -271,10 +204,19 @@ MDScreen:
 
     BoxLayoutBelowToolbar:
 
-        MDStackLayout:            
-            CheckBoxWithText:
-                size_hint: 1, 0.2
-                label_text: 'Есть ли месячные?'
+        MDStackLayout:
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint: 1, 0.1
+
+                CheckBoxWithText:
+                    size_hint: 0.4, 1
+                    label_text: 'Есть ли месячные?'
+
+                MDRaisedButton:
+                    text: 'Дата'
+                # MDDatePicker:
+                #     size_hint: 0.6, 1
 
             MDBoxLayout:
                 size_hint: 1, 0.07   
@@ -307,7 +249,7 @@ MDScreen:
 
             MDBoxLayout:
                 orientation: 'horizontal'
-                size_hint: 1, 0.63 
+                size_hint: 1, 0.73 
 
                 SelectableList:
                     id: selectable_list
@@ -346,14 +288,30 @@ MDScreen:
                     text: "Сохранить"
                     on_press: root.save_data()
 
-<MyItem>
-    text: "Two-line item with avatar"
-    secondary_text: "Secondary text here"
-    _no_ripple_effect: True
-'''
+<AddStressScreen>:
+    MDTextField:
+        id: stress_level
+        hint_text: "Уровень стресса (число)"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        input_filter: 'int'
+        size_hint_x: None
+        width: 300
 
-class MyItem(TwoLineAvatarListItem):
-    pass
+    MDFlatButton:
+        text: "Выбрать дату"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        on_release: root.open_date_picker()
+
+    # MDFlatButton:
+    #     text: "Выбрать время"
+    #     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    #     on_release: root.show_time_picker()
+
+    MDFlatButton:
+        text: "Добавить запись"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+        on_release: root.add_stress_entry()
+'''
 
 class UserInfoScreen(MDScreen):
     def __init__(self, *args, **kwargs):
@@ -377,26 +335,32 @@ class AddMenstruationInfoScreen(MDScreen):
             self.ids.selectable_list.add_item(f"Item {i}", ListItem(id=i))
 
     def save_data(self):
+        items = self.ids.selectable_list
+        print(f'Selected Items:')
+        for item in items.get_selected_items():
+            print(f'Selected \'{item.id}\'.')
+
+class AddStressScreen(MDScreen):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def open_date_picker(self):
+        date_dialog = MDDatePicker()
+        date_dialog.bind(on_save=self.get_date_of_picker)
+        date_dialog.open()
+
+    def get_date_of_picker(self, instance, value, date_range):
+        # Обработка выбранной даты
+        print("Выбранная дата:", value)
+
+    def add_stress_entry(self):
         pass
+        # stress_level = self.sm.get_screen('stress_entry').ids.stress_level.text
+        # Добавление записи о стрессе
+        # print("Уровень стресса:", stress_level)
 
 class RadioButtonWithText(MDBoxLayout):
     label_text = StringProperty('')
-
-class ListItem(IListItem):
-    def __init__(self, id: int) -> None:
-        self.id = id
-        super().__init__()
-    
-    @property
-    def id(self) -> int:
-        return self._id
-    
-    @id.setter
-    def id(self, id: int):
-        self._id = id
-
-    def set_selected(self, is_selected: bool):
-        print(f"Item {self.id} selected!")
         
 class CheckBoxWithText(MDBoxLayout):
     label_text = StringProperty('')
