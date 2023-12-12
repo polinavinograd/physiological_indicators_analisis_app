@@ -82,19 +82,11 @@ MDScreen:
             AddStressScreen:
                 name: "scr_stress_screen"
                     
-            MDScreen:
+            AddNutritionsScreen:
                 name: "scr_nutritions_screen"
-
-                MDLabel:
-                    text: "Информация о приеме пищи"
-                    halign: "center"
                     
-            MDScreen:
+            AddTrainingScreen:
                 name: "scr_fitness_screen"
-
-                MDLabel:
-                    text: "Информация о проведенной тренировке"
-                    halign: "center"
                     
             AddMenstruationInfoScreen:
                 name: "scr_menstruation_screen"
@@ -123,22 +115,22 @@ MDScreen:
                         root.screen_manager.current = "scr_stress_screen"
 
                 DrawerClickableItem:
-                    icon: "alert-outline"
-                    text: "Питание"
+                    icon: "food-apple"
+                    text: "Добавить питание"
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_nutritions_screen"
 
                 DrawerClickableItem:
-                    icon: "alert-outline"
-                    text: "Тренировки"
+                    icon: "dumbbell"
+                    text: "Добавить тренировку"
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_fitness_screen"
 
                 DrawerClickableItem:
-                    icon: "alert-outline"
-                    text: "Месячный цикл"
+                    icon: "water"
+                    text: "Добавить месячный цикл"
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_menstruation_screen"
@@ -302,15 +294,68 @@ MDScreen:
         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
         on_release: root.open_date_picker()
 
-    # MDFlatButton:
-    #     text: "Выбрать время"
-    #     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-    #     on_release: root.show_time_picker()
-
     MDFlatButton:
         text: "Добавить запись"
         pos_hint: {'center_x': 0.5, 'center_y': 0.4}
         on_release: root.add_stress_entry()
+
+<AddNutritionsScreen>:
+    MDFlatButton:
+        text: "Выбрать дату"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        on_release: root.open_date_picker()
+
+    # SelectableList:
+    #     id: selectable_list
+    #     size_hint: 0.6, 1 
+    #     canvas.before:
+    #         Color:
+    #             rgba: 255, 0, 0, 1
+    #         Line:
+    #             width:
+    #             rectangle: self.x, self.y, self.width, self.height
+
+    MDTextField:
+        id: stress_level
+        hint_text: "Масса (в граммах)"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        input_filter: 'float'
+        size_hint_x: None
+        width: 300
+        
+    MDFlatButton:
+        text: "Добавить запись"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+        on_release: root.add_nutritions_entry()
+
+<AddTrainingScreen>:
+    MDFlatButton:
+        text: "Выбрать дату"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        on_release: root.open_date_picker()
+
+    # SelectableList:
+    #     id: selectable_list
+    #     size_hint: 0.6, 1 
+    #     canvas.before:
+    #         Color:
+    #             rgba: 255, 0, 0, 1
+    #         Line:
+    #             width:
+    #             rectangle: self.x, self.y, self.width, self.height
+
+    MDTextField:
+        id: stress_level
+        hint_text: "Время (в минутах)"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        input_filter: 'int'
+        size_hint_x: None
+        width: 300
+        
+    MDFlatButton:
+        text: "Добавить запись"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+        on_release: root.add_nutritions_entry()
 '''
 
 class UserInfoScreen(MDScreen):
@@ -346,7 +391,7 @@ class AddStressScreen(MDScreen):
 
     def open_date_picker(self):
         date_dialog = MDDatePicker()
-        date_dialog.bind(on_save=self.get_date_of_picker)
+        date_dialog.bind (on_save=self.get_date_of_picker)
         date_dialog.open()
 
     def get_date_of_picker(self, instance, value, date_range):
@@ -358,6 +403,38 @@ class AddStressScreen(MDScreen):
         # stress_level = self.sm.get_screen('stress_entry').ids.stress_level.text
         # Добавление записи о стрессе
         # print("Уровень стресса:", stress_level)
+
+class AddNutritionsScreen(MDScreen):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def open_date_picker(self) -> None:
+        date_dialog = MDDatePicker()
+        date_dialog.bind(on_save=self.get_date_of_picker)
+        date_dialog.open()
+
+    def get_date_of_picker(self, instance, value, date_range):
+        # Обработка выбранной даты
+        print("Выбранная дата:", value)
+
+    def add_nutritions_entry(self):
+        pass
+
+class AddTrainingScreen(MDScreen):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def open_date_picker(self) -> None:
+        date_dialog = MDDatePicker()
+        date_dialog.bind(on_save=self.get_date_of_picker)
+        date_dialog.open()
+        
+    def get_date_of_picker(self, instance, value, date_range):
+        # Обработка выбранной даты
+        print("Выбранная дата:", value)
+
+    def add_training_entry(self):
+        pass
 
 class RadioButtonWithText(MDBoxLayout):
     label_text = StringProperty('')
