@@ -137,6 +137,12 @@ MDScreen:
                         root.screen_manager.current = "scr_menstruation_screen"
 
 <UserInfoScreen>:
+
+    # MDDropDownItem:
+    #     id: drop_item
+    #     pos_hint: {'center_x': .5, 'center_y': .5}
+    #     text: 'Item 0'
+    #     on_release: app.menu.open()
         # MDBoxLayout:
         #     orientation: 'horizontal'
         #     MDLabel:

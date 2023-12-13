@@ -1,7 +1,9 @@
 ﻿from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
+from kivymd.uix.dropdownitem import MDDropDownItem
 from kivymd.uix.scrollview import MDScrollView
 from kivymd.uix.textfield import MDTextField
+from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import MDList
 from typing import List
 from abc import ABC, abstractmethod
@@ -138,3 +140,46 @@ class InputTextField(MDTextField):
     def on_focus(self, instance_text_field: MDTextField, focus: bool) -> None:
         if focus is False: # If user leaves the field
             self.value.save_value(instance_text_field.text)
+
+class DropDownListItem:
+    def __init__(self, title: str) -> None:
+        self.__title = title
+
+    @property
+    def title(self) -> str:
+        return self.__title
+
+class DropDownList(MDDropDownItem):
+    def __init__(self, items: List[DropDownListItem], *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if items.__len__() == 0:
+            raise ValueError('DropDownList must have at least one value.')
+
+        self.text = items[0].title
+
+        menu_items = [
+            {
+                "text": item.title,
+                "on_release": self.on_item_set,
+            } for item in items
+        ]
+
+        self.__menu = MDDropdownMenu(
+            caller=self,
+            items=menu_items,
+            position="center",
+        )
+
+        self.__menu.bind()
+
+    def on_release(self):
+        self.__menu.open()
+
+    def set_item(self, text_item):
+        pass
+        # self.screen.ids.drop_item.set_item(text_item)
+        # self.menu.dismiss()
+
+    def on_item_set(self, *args):
+        self.set_item('aaa')
+        self.__menu.dismiss()

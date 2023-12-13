@@ -2,8 +2,9 @@
 from kivymd.uix.boxlayout import MDBoxLayout
 from model.user import User
 from enum import Enum
-from views.shared_components import InputTextField, SaveableInputString, SaveableInputInteger
+from views.shared_components import InputTextField, SaveableInputString, SaveableInputInteger, DropDownList, DropDownListItem
 from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.dropdownitem import MDDropDownItem
 from kivy.metrics import dp
 
 class Gender(Enum):
@@ -89,6 +90,8 @@ class UserInfoScreen(MDScreen):
             InputTextField(self.user.weight, input_filter='int', hint_text='Вес (в кг)'),
             InputTextField(self.user.height, input_filter='int', hint_text='Рост (в см)'),
             InputTextField(self.user.age, input_filter='int', hint_text='Возраст'),
+            DropDownList([DropDownListItem('Male'), DropDownListItem('Female')]),
+            # MDDropDownItem(text='Мужчина', on_release='root.open()'),
             saveButton,
             orientation='vertical', padding=(dp(20), dp(0), dp(20), dp(20)), spacing=dp(20)
         ))
@@ -103,3 +106,6 @@ class UserInfoScreen(MDScreen):
             self.user.brm) # TODO: Нужно ли отображать brm?
         
         # TODO: Обновить данные пользователя
+
+    def open(self):
+        pass
