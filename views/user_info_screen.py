@@ -21,7 +21,7 @@ class UserViewModel:
         self.__user_name = SaveableInputString()
         self.__weight = SaveableInputInteger()
         self.__height = SaveableInputInteger()
-        self.__age = SaveableInputString()
+        self.__age = SaveableInputInteger()
         self.__sex = None
         self.__brm = None
 
@@ -50,7 +50,7 @@ class UserViewModel:
         self.__height.save_value(height)
         
     @property
-    def age(self) -> SaveableInputString:
+    def age(self) -> SaveableInputInteger:
         return self.__age
     
     @age.setter
@@ -85,16 +85,17 @@ class UserInfoScreen(MDScreen):
         saveButton = MDRaisedButton(text='Обновить')
         saveButton.bind(on_release=self.save_user_data)
 
+        self.__gender_list = DropDownList([
+                DropDownListItem('Женский', Gender.Female),
+                DropDownListItem('Мужской', Gender.Male),
+                DropDownListItem('Не указан', Gender.Undefined)])
+
         self.add_widget(MDBoxLayout(
             InputTextField(self.user.user_name, hint_text='Ваш никнейм'),
             InputTextField(self.user.weight, input_filter='int', hint_text='Вес (в кг)'),
             InputTextField(self.user.height, input_filter='int', hint_text='Рост (в см)'),
             InputTextField(self.user.age, input_filter='int', hint_text='Возраст'),
-            DropDownList([
-                DropDownListItem('Женский', Gender.Female),
-                DropDownListItem('Мужской', Gender.Male),
-                DropDownListItem('Не указан', Gender.Undefined)]),
-            # MDDropDownItem(text='Мужчина', on_release='root.open()'),
+            self.__gender_list,
             saveButton,
             orientation='vertical', padding=(dp(20), dp(0), dp(20), dp(20)), spacing=dp(20)
         ))
@@ -105,7 +106,7 @@ class UserInfoScreen(MDScreen):
             self.user.weight.get_value(),
             self.user.height.get_value(),
             self.user.age.get_value(),
-            self.user.sex,
+            self.__gender_list.selected_item.value.value,
             self.user.brm) # TODO: Нужно ли отображать brm?
         
         # TODO: Обновить данные пользователя

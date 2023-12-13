@@ -193,10 +193,10 @@ class DropDownList(MDDropDownItem):
     def on_release(self) -> None:
         self.__menu.open()
 
-    def on_item_set(self, selected_item: DropDownListItem):
+    def on_item_set(self, selected_item: DropDownListItem) -> None:
         self.__set_selected_item(selected_item)
         self.__menu.dismiss()
     
-    def __set_selected_item(self, item: DropDownListItem):
+    def __set_selected_item(self, item: DropDownListItem) -> None:
         self.__selected_item = item
         self.text = item.title
