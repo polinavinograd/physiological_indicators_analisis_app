@@ -111,6 +111,3 @@ class AddNutritionsScreen(MDScreen):
 
         ingredients_and_mass = { record.ingredient_name.get_value(): record.mass.get_value() for record in added_ingredients }
         calories_module.set_calories_intake(selected_date.__str__(), ingredients_and_mass)
-
-        # for item in added_ingredients:
-        #     print(f'Added {item.ingredient_name}')
