@@ -8,7 +8,8 @@ from kivy.clock import Clock
 from kivymd.uix.pickers import MDDatePicker, MDTimePicker
 from views.shared_components import *
 from views.user_info_screen import *
-
+from views.add_stress_screen import *
+from data_storage.data_store import IndicatorsDataStorage
 
 KV = '''
 
@@ -142,29 +143,6 @@ MDScreen:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_menstruation_screen"
 
-<UserInfoScreen>:
-
-    # MDDropDownItem:
-    #     id: drop_item
-    #     pos_hint: {'center_x': .5, 'center_y': .5}
-    #     text: 'Item 0'
-    #     on_release: app.menu.open()
-        # MDBoxLayout:
-        #     orientation: 'horizontal'
-        #     MDLabel:
-        #         text: 'Пол: '
-        #         size_hint_x: None
-        #         width: dp(48)
-
-        #     MDDropDownItem:
-        #         id: sex_select
-        #         text: 'Gender'
-        #         on_release: root.genders.open()
-
-        #     MDSwitch:
-        #         id: sex_switch
-        #         # 'active' will be True if the switch is on (male) and False if it's off (female)
-
 <AddMenstruationInfoScreen>:
     selectable_list: selectable_list
 
@@ -254,25 +232,6 @@ MDScreen:
                     text: "Сохранить"
                     on_press: root.save_data()
 
-<AddStressScreen>:
-    MDTextField:
-        id: stress_level
-        hint_text: "Уровень стресса (число)"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
-        input_filter: 'int'
-        size_hint_x: None
-        width: 300
-
-    MDFlatButton:
-        text: "Выбрать дату"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
-        on_release: root.open_date_picker()
-
-    MDFlatButton:
-        text: "Добавить запись"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.4}
-        on_release: root.add_stress_entry()
-
 <AddNutritionsScreen>:
     MDFlatButton:
         text: "Выбрать дату"
@@ -347,25 +306,6 @@ class AddMenstruationInfoScreen(MDScreen):
         for item in items.get_selected_items():
             print(f'Selected \'{item.id}\'.')
 
-class AddStressScreen(MDScreen):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-    def open_date_picker(self):
-        date_dialog = MDDatePicker()
-        date_dialog.bind (on_save=self.get_date_of_picker)
-        date_dialog.open()
-
-    def get_date_of_picker(self, instance, value, date_range):
-        # Обработка выбранной даты
-        print("Выбранная дата:", value)
-
-    def add_stress_entry(self):
-        pass
-        # stress_level = self.sm.get_screen('stress_entry').ids.stress_level.text
-        # Добавление записи о стрессе
-        # print("Уровень стресса:", stress_level)
-
 class AddNutritionsScreen(MDScreen):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -406,6 +346,9 @@ class CheckBoxWithText(MDBoxLayout):
 
 class Example(MDApp):
     def build(self):
+        self.user = User('polina.vngrd', weight=56, height=169, age=20)
+        self.data_storage = IndicatorsDataStorage()
+
         self.theme_cls.primary_palette = "Orange"
         self.theme_cls.theme_style = "Dark"
         return Builder.load_string(KV)

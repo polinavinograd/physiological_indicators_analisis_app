@@ -1,10 +1,13 @@
 ﻿from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
+from kivymd.uix.pickers import MDDatePicker, MDTimePicker
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.dropdownitem import MDDropDownItem
 from kivymd.uix.scrollview import MDScrollView
 from kivymd.uix.textfield import MDTextField
+from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import MDList
+from datetime import date, time, datetime
 from typing import Any, List
 from abc import ABC, abstractmethod
 
@@ -136,9 +139,10 @@ class SaveableInputInteger(ISaveableInputValue):
         return self.__value
     
 class InputTextField(MDTextField):
-    def __init__(self, value: ISaveableInputValue, *args, **kwargs) -> None:
+    def __init__(self, value: ISaveableInputValue, title: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.value = value
+        self.hint_text= title
         self.text = self.value.get_value().__str__()
 
     def on_focus(self, instance_text_field: MDTextField, focus: bool) -> None:
@@ -164,12 +168,12 @@ class IconListItem(OneLineIconListItem):
 class DropDownList(MDDropDownItem):
     __selected_item: DropDownListItem
 
-    def __init__(self, items: List[DropDownListItem], *args, **kwargs) -> None:
+    def __init__(self, items: List[DropDownListItem], index_to_display: int = 0, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if items.__len__() == 0:
             raise ValueError('DropDownList must have at least one value.')
 
-        self.__set_selected_item(items[0])
+        self.__set_selected_item(items[index_to_display])
 
         menu_items = [
             {
@@ -200,3 +204,45 @@ class DropDownList(MDDropDownItem):
     def __set_selected_item(self, item: DropDownListItem) -> None:
         self.__selected_item = item
         self.text = item.title
+
+class DatePickerButton(MDRaisedButton):
+    def __init__(self, title: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.text = title
+        self.__selected_date = date.today()
+
+    @property
+    def selected_date(self) -> date:
+        return self.__selected_date
+
+    def on_release(self) -> None:
+        self.__open_date_picker()
+
+    def __open_date_picker(self) -> None:
+        date_dialog = MDDatePicker()
+        date_dialog.bind(on_save=self.save_selected_date)
+        date_dialog.open()
+
+    def save_selected_date(self, instance: MDDatePicker, selected_date: date, date_range):
+        self.__selected_date = selected_date
+        
+class TimePickerButton(MDRaisedButton):
+    def __init__(self, title: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.text = title
+        self.__selected_time = datetime.now().time()
+
+    @property
+    def selected_time(self) -> time:
+        return self.__selected_time
+
+    def on_release(self) -> None:
+        self.__open_time_picker()
+
+    def __open_time_picker(self) -> None:
+        date_dialog = MDTimePicker()
+        date_dialog.bind(on_save=self.save_selected_time)
+        date_dialog.open()
+
+    def save_selected_time(self, instance: MDDatePicker, selected_time: time):
+        self.__selected_time = selected_time

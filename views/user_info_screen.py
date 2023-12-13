@@ -5,6 +5,7 @@ from enum import Enum
 from views.shared_components import InputTextField, SaveableInputString, SaveableInputInteger, DropDownList, DropDownListItem
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.dropdownitem import MDDropDownItem
+from kivymd.app import MDApp
 from kivy.metrics import dp
 
 class Gender(Enum):
@@ -57,13 +58,13 @@ class UserViewModel:
     def age(self, age: int) -> None:
         self.__age.save_value(age)
         
-    @property
-    def sex(self) -> Gender:
-        return self.__sex
+    # @property
+    # def sex(self) -> Gender:
+    #     return self.__sex
     
-    @sex.setter
-    def sex(self, sex: Gender) -> None:
-        self.__sex = sex
+    # @sex.setter
+    # def sex(self, sex: Gender) -> None:
+    #     self.__sex = sex
         
     @property
     def brm(self) -> float:
@@ -80,36 +81,54 @@ class UserInfoScreen(MDScreen):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = UserViewModel()
+        
+        user_data = MDApp.get_running_app().user
+        self.__set_user_view(user_data)
 
         saveButton = MDRaisedButton(text='Обновить')
         saveButton.bind(on_release=self.save_user_data)
 
-        self.__gender_list = DropDownList([
-                DropDownListItem('Женский', Gender.Female),
-                DropDownListItem('Мужской', Gender.Male),
-                DropDownListItem('Не указан', Gender.Undefined)])
-
         self.add_widget(MDBoxLayout(
-            InputTextField(self.user.user_name, hint_text='Ваш никнейм'),
-            InputTextField(self.user.weight, input_filter='int', hint_text='Вес (в кг)'),
-            InputTextField(self.user.height, input_filter='int', hint_text='Рост (в см)'),
-            InputTextField(self.user.age, input_filter='int', hint_text='Возраст'),
+            InputTextField(self.__user_view_model.user_name, title='Ваш никнейм'),
+            InputTextField(self.__user_view_model.weight, title='Вес (в кг)', input_filter='int'),
+            InputTextField(self.__user_view_model.height, title='Рост (в см)', input_filter='int'),
+            InputTextField(self.__user_view_model.age, title='Возраст', input_filter='int'),
             self.__gender_list,
             saveButton,
             orientation='vertical', padding=(dp(20), dp(0), dp(20), dp(20)), spacing=dp(20)
         ))
     
     def save_user_data(self, instance: MDRaisedButton):
-        userData = User(
-            self.user.user_name.get_value(),
-            self.user.weight.get_value(),
-            self.user.height.get_value(),
-            self.user.age.get_value(),
+        user_data = User(
+            self.__user_view_model.user_name.get_value(),
+            self.__user_view_model.weight.get_value(),
+            self.__user_view_model.height.get_value(),
+            self.__user_view_model.age.get_value(),
             self.__gender_list.selected_item.value.value,
-            self.user.brm) # TODO: Нужно ли отображать brm?
+            self.__user_view_model.brm) # TODO: Нужно ли отображать brm?
         
-        # TODO: Обновить данные пользователя
+        MDApp.get_running_app().user = user_data
+        
+        # TODO: Обновить данные пользователя в БД
 
-    def open(self):
-        pass
+    def __set_user_view(self, user_data: User) -> None:
+        self.__user_view_model = UserViewModel()
+        self.__user_view_model.user_name.save_value(user_data.name)
+        self.__user_view_model.weight.save_value(user_data.weight)
+        self.__user_view_model.height.save_value(user_data.height)
+        self.__user_view_model.age.save_value(user_data.age)
+        self.__user_view_model.brm = user_data.brm
+
+        # TODO: В БД отсутсвует колонка 'Sex'
+        
+        index_to_display = 2 # Индекс опции 'Не указан'
+        if user_data.sex == Gender.Female.value:
+            index_to_display = 0
+        elif user_data.sex == Gender.Male.value:
+            index_to_display = 1
+        
+        self.__gender_list = DropDownList([
+                DropDownListItem('Женский', Gender.Female),
+                DropDownListItem('Мужской', Gender.Male),
+                DropDownListItem('Не указан', Gender.Undefined)],
+                index_to_display=index_to_display)
