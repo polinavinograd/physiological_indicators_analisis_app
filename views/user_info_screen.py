@@ -57,14 +57,6 @@ class UserViewModel:
     def age(self, age: int) -> None:
         self.__age.save_value(age)
         
-    # @property
-    # def sex(self) -> Gender:
-    #     return self.__sex
-    
-    # @sex.setter
-    # def sex(self, sex: Gender) -> None:
-    #     self.__sex = sex
-        
     @property
     def brm(self) -> float:
         return self.__brm

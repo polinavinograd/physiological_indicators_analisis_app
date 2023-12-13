@@ -14,6 +14,14 @@ from data_storage.data_store import IndicatorsDataStorage
 
 KV = '''
 
+<MDBoxLayout>:
+    canvas.before:
+        Color:
+            rgba: 255, 0, 0, 1
+        Line:
+            width:
+            rectangle: self.x, self.y, self.width, self.height
+
 <IconListItem>
 
     IconLeftWidget:
