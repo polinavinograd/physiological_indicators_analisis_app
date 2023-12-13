@@ -104,7 +104,7 @@ class UserInfoScreen(MDScreen):
             self.__user_view_model.height.get_value(),
             self.__user_view_model.age.get_value(),
             self.__gender_list.selected_item.value.value,
-            self.__user_view_model.brm) # TODO: Нужно ли отображать brm?
+            self.__user_view_model.brm)
         
         MDApp.get_running_app().user = user_data
         
@@ -117,8 +117,6 @@ class UserInfoScreen(MDScreen):
         self.__user_view_model.height.save_value(user_data.height)
         self.__user_view_model.age.save_value(user_data.age)
         self.__user_view_model.brm = user_data.brm
-
-        # TODO: В БД отсутсвует колонка 'Sex'
         
         index_to_display = 2 # Индекс опции 'Не указан'
         if user_data.sex == Gender.Female.value:

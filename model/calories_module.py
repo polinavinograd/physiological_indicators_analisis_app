@@ -87,4 +87,4 @@ class CaloriesModule:
         report = CalorieReport(self.user, current_date, calories_consumed, calories_burned, daily_norm).report
         return report
 
-# TODO добавить функции добавления упражнения и ингредиента
+# TODO добавить функции получения списка всех упражнений и ингредиентов
