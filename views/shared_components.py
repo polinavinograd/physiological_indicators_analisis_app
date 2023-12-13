@@ -5,7 +5,7 @@ from kivymd.uix.scrollview import MDScrollView
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import MDList
-from typing import List
+from typing import Any, List
 from abc import ABC, abstractmethod
 
 
@@ -146,30 +146,36 @@ class InputTextField(MDTextField):
             self.value.save_value(instance_text_field.text)
 
 class DropDownListItem:
-    def __init__(self, title: str) -> None:
+    def __init__(self, title: str, value: Any) -> None:
         self.__title = title
+        self.__value = value
 
     @property
     def title(self) -> str:
         return self.__title
     
+    @property
+    def value(self) -> Any:
+        return self.__value
 
 class IconListItem(OneLineIconListItem):
     icon = StringProperty()
 
 class DropDownList(MDDropDownItem):
+    __selected_item: DropDownListItem
+
     def __init__(self, items: List[DropDownListItem], *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if items.__len__() == 0:
             raise ValueError('DropDownList must have at least one value.')
 
-        self.text = items[0].title
+        self.__set_selected_item(items[0])
 
         menu_items = [
             {
                 "viewclass": "IconListItem",
                 "text": item.title,
-                "on_release": lambda x=item.title: self.on_item_set(x)
+                "on_release": lambda selected_item = item: self.on_item_set(selected_item)
             } for item in items
         ]
 
@@ -180,11 +186,17 @@ class DropDownList(MDDropDownItem):
             width_mult=4,
         )
 
-        self.__menu.bind()
+    @property
+    def selected_item(self) -> DropDownListItem:
+        return self.__selected_item
 
-    def on_release(self):
+    def on_release(self) -> None:
         self.__menu.open()
 
-    def on_item_set(self, text_item):
-        self.text = text_item
+    def on_item_set(self, selected_item: DropDownListItem):
+        self.__set_selected_item(selected_item)
         self.__menu.dismiss()
+    
+    def __set_selected_item(self, item: DropDownListItem):
+        self.__selected_item = item
+        self.text = item.title

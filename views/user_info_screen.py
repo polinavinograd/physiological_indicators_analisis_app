@@ -90,7 +90,10 @@ class UserInfoScreen(MDScreen):
             InputTextField(self.user.weight, input_filter='int', hint_text='Вес (в кг)'),
             InputTextField(self.user.height, input_filter='int', hint_text='Рост (в см)'),
             InputTextField(self.user.age, input_filter='int', hint_text='Возраст'),
-            DropDownList([DropDownListItem('Male'), DropDownListItem('Female')]),
+            DropDownList([
+                DropDownListItem('Женский', Gender.Female),
+                DropDownListItem('Мужской', Gender.Male),
+                DropDownListItem('Не указан', Gender.Undefined)]),
             # MDDropDownItem(text='Мужчина', on_release='root.open()'),
             saveButton,
             orientation='vertical', padding=(dp(20), dp(0), dp(20), dp(20)), spacing=dp(20)
