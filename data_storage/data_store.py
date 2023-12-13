@@ -173,6 +173,7 @@ class IndicatorsDataStorage:
             except sqlite3.Error as e:
                 print(f"Ошибка при вставке данных: {e}")
 
+        # TODO: обновить юзера
         return False
 
     def __user_exists(self, user_id: str) -> bool:

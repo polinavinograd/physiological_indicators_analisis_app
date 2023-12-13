@@ -38,10 +38,10 @@ class AddTrainingBox(MDBoxLayout):
 
         self.__new_training_record = NewTrainingRecord()
 
-        self.__ingredient_input = InputTextField(self.__new_training_record.training_name, title='Введите ингредиент')
+        self.__ingredient_input = InputTextField(self.__new_training_record.training_name, title='Введите упражнение')
         self.__mass_input = InputTextField(
             self.__new_training_record.minutes,
-            title='Масса (в г)',
+            title='Время (в минутах)',
             input_filter='int',
             size_hint=(0.8, 1))
 
