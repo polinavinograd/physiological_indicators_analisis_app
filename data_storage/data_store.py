@@ -121,8 +121,13 @@ class IndicatorsDataStorage:
                 WHERE user_id = ? AND date = ?
             """
         self.cursor.execute(query, (user_id, current_date))
-        result = self.cursor.fetchone() # TODO: А если это первый запрос за день?
-        return result[0]
+        # result = self.cursor.fetchone() # TODO: А если это первый запрос за день?
+        # return result[0]
+        data = self.cursor.fetchone()
+        if data == None or len(data) == 0:
+            return 0
+
+        return data[0]
 
     def get_calories_burned_by_day(self, user_id: str, current_date: str) -> int:
         query = f"""
@@ -133,7 +138,12 @@ class IndicatorsDataStorage:
         print(user_id)
         print(current_date)
         self.cursor.execute(query, (user_id, current_date))
-        return self.cursor.fetchone()[0]
+
+        data = self.cursor.fetchone()
+        if data == None or len(data) == 0:
+            return 0
+
+        return data[0]
 
     def get_menstual_info(self, user_id: str):
         query = f"""

@@ -1,14 +1,13 @@
 ﻿from kivymd.uix.screen import MDScreen
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.boxlayout import MDBoxLayout
-from views.shared_components import InputTextField, ListItem, SaveableInputInteger, DatePickerButton, SelectableList, SaveableInputString
+from views.shared_components import DatePickerButton
 from kivymd.app import MDApp
 from kivymd.uix.label import MDLabel
 from kivy.metrics import dp
 from typing import List
-from model.calories_module import CaloriesModule
 from model.stress_module import StressModule
-from datetime import date, time, datetime
+from datetime import date
 
 class CheckStressScreen(MDScreen):
     def __init__(self, *args, **kwargs):
@@ -18,7 +17,7 @@ class CheckStressScreen(MDScreen):
         self.__period_end_picker = DatePickerButton(title='Выберите конец периода')
 
         self.__average_stress_lable = MDLabel()
-        calculate_button = MDRaisedButton(text='Сохранить', pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        calculate_button = MDRaisedButton(text='Высчитать', pos_hint={'center_x': 0.5, 'center_y': 0.5})
         calculate_button.bind(on_release=self.calculate_average_stress)
 
         self.add_widget(MDBoxLayout(

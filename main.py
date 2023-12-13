@@ -11,6 +11,7 @@ from views.add_nutritions_screen import *
 from views.add_training_screen import *
 from views.check_stress_screen import *
 from views.add_menstruation_info_screen import *
+from views.get_calorie_report_screen import *
 from data_storage.data_store import IndicatorsDataStorage
 
 KV = '''
@@ -104,6 +105,9 @@ MDScreen:
             CheckStressScreen:
                 name: "scr_check_stress_screen"
 
+            GetCalorieReportScreen:
+                name: "scr_get_calorie_report"
+
         MDNavigationDrawer:
             id: nav_drawer
             radius: (0, 16, 16, 0)
@@ -154,6 +158,13 @@ MDScreen:
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_check_stress_screen"
+                        
+                DrawerClickableItem:
+                    icon: "file-document-check-outline"
+                    text: "Отчет по калориям"
+                    on_press:
+                        root.nav_drawer.set_state("close")
+                        root.screen_manager.current = "scr_get_calorie_report"
 
 <AddMenstruationInfoScreen>:
     selectable_list: selectable_list
@@ -268,7 +279,7 @@ class CheckBoxWithText(MDBoxLayout):
 
 class Example(MDApp):
     def build(self):
-        self.user = User('polina.vngrd', weight=56, height=169, age=20)
+        self.user = User('polina.vngrd', weight=56, height=169, age=20, sex=False)
         self.data_storage = IndicatorsDataStorage()
 
         self.theme_cls.primary_palette = "Orange"
