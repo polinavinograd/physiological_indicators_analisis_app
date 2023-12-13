@@ -4,9 +4,10 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.properties import StringProperty
 from model.user import User
-from views.shared_components import *
 from kivy.clock import Clock
 from kivymd.uix.pickers import MDDatePicker, MDTimePicker
+from views.shared_components import *
+from views.user_info_screen import *
 
 
 KV = '''
@@ -136,60 +137,21 @@ MDScreen:
                         root.screen_manager.current = "scr_menstruation_screen"
 
 <UserInfoScreen>:
-    MDBoxLayout:
-        orientation: 'vertical'
-        padding: dp(20), dp(60), dp(20), dp(20)  # Left, Top, Right, Bottom
-        spacing: dp(10)
+        # MDBoxLayout:
+        #     orientation: 'horizontal'
+        #     MDLabel:
+        #         text: 'Пол: '
+        #         size_hint_x: None
+        #         width: dp(48)
 
-        # MDTextField:
-        #     id: user_id_field
-        #     hint_text: 'User ID'
-        #     helper_text: 'Enter your user ID'
-        #     helper_text_mode: 'on_focus'
+        #     MDDropDownItem:
+        #         id: sex_select
+        #         text: 'Gender'
+        #         on_release: root.genders.open()
 
-        MDTextField:
-            id: weight_field
-            hint_text: 'Вес (в кг)'
-            helper_text: 'Enter your weight in kg'
-            helper_text_mode: 'on_focus'
-            input_filter: 'float'
-            text: root.user.weight.__str__()
-
-        MDTextField:
-            id: height_field
-            hint_text: 'Рост (в см)'
-            helper_text: 'Enter your height in cm'
-            helper_text_mode: 'on_focus'
-            input_filter: 'float',
-            text: root.user.height.__str__()
-
-        MDTextField:
-            id: age_field
-            hint_text: 'Возраст'
-            helper_text: 'Enter your age'
-            helper_text_mode: 'on_focus'
-            input_filter: 'int'
-            text: root.user.age.__str__()
-
-        MDBoxLayout:
-            orientation: 'horizontal'
-            MDLabel:
-                text: 'Пол: '
-                size_hint_x: None
-                width: dp(48)
-
-            MDDropDownItem:
-                id: sex_select
-                text: 'Gender'
-                on_release: root.genders.open()
-
-            MDSwitch:
-                id: sex_switch
-                # 'active' will be True if the switch is on (male) and False if it's off (female)
-
-        MDRaisedButton:
-            text: 'Обновить'
-            on_release: root.save_user_data()
+        #     MDSwitch:
+        #         id: sex_switch
+        #         # 'active' will be True if the switch is on (male) and False if it's off (female)
 
 <AddMenstruationInfoScreen>:
     selectable_list: selectable_list
@@ -357,18 +319,6 @@ MDScreen:
         pos_hint: {'center_x': 0.5, 'center_y': 0.4}
         on_release: root.add_nutritions_entry()
 '''
-
-class UserInfoScreen(MDScreen):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user = User("V", 12, 12, 12, True, 12)
-        self.gendersDict = {
-            "Male": True,
-            "Female": False
-        }
-    
-    def save_user_data(self):
-        pass
     
 class AddMenstruationInfoScreen(MDScreen):
     def __init__(self, *args, **kwargs):

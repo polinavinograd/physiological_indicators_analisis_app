@@ -1,8 +1,10 @@
 ﻿from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.scrollview import MDScrollView
+from kivymd.uix.textfield import MDTextField
 from kivymd.uix.list import MDList
 from typing import List
+from abc import ABC, abstractmethod
 
 class ListItem:
     '''
@@ -88,3 +90,51 @@ class SelectableList(MDScrollView):
 
     def get_selected_items(self) -> List[ListItem]:
         return filter(lambda item: item.is_selected, self.__items_data)
+    
+class ISaveableInputValue(ABC):
+    '''
+    Defines the contract to save the input values.
+    '''
+
+    @abstractmethod
+    def save_value(self, value: str) -> None:
+        pass
+    
+    @abstractmethod
+    def get_value(self):
+        pass
+    
+class SaveableInputString(ISaveableInputValue):
+    __value: str
+    
+    def __init__(self) -> None:
+        self.__value = ''
+
+    def save_value(self, value: str) -> None:
+        self.__value = value
+    
+    def get_value(self) -> str:
+        return self.__value
+    
+class SaveableInputInteger(ISaveableInputValue):
+    __value: int
+    
+    def __init__(self) -> None:
+        self.__value = 0
+
+    def save_value(self, value: str) -> None:
+        if value is not '':
+            self.__value = int(value)
+    
+    def get_value(self) -> int:
+        return self.__value
+    
+class InputTextField(MDTextField):
+    def __init__(self, value: ISaveableInputValue, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.value = value
+        self.text = self.value.get_value().__str__()
+
+    def on_focus(self, instance_text_field: MDTextField, focus: bool) -> None:
+        if focus is False: # If user leaves the field
+            self.value.save_value(instance_text_field.text)
