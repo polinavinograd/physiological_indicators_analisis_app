@@ -35,7 +35,7 @@ class AddStressScreen(MDScreen):
         self.__time_picker = TimePickerButton(title='Выберите время', pos_hint={'center_x': 0.5, 'center_y': 0.5})
         
         self.add_widget(MDBoxLayout(
-            InputTextField(self.__stress_entry.strees_level, title='Уровень стресса (число)', pos_hint={'center_x': 0.5, 'center_y': 0.5}),
+            InputTextField(self.__stress_entry.strees_level, title='Уровень стресса (число)', input_filter='int', pos_hint={'center_x': 0.5, 'center_y': 0.5}),
             self.__date_picker,
             self.__time_picker,
             save_button,

@@ -4,14 +4,13 @@ from model.user import User
 from enum import Enum
 from views.shared_components import InputTextField, SaveableInputString, SaveableInputInteger, DropDownList, DropDownListItem
 from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.dropdownitem import MDDropDownItem
 from kivymd.app import MDApp
 from kivy.metrics import dp
 
 class Gender(Enum):
     Undefined = None
-    Female = True
-    Male = False
+    Female = False
+    Male = True
 
 class UserViewModel:
     '''

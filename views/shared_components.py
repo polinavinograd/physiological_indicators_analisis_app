@@ -20,14 +20,19 @@ class ListItem:
     The data of the SelectableList item.
     '''
         
-    def __init__(self, id: int) -> None:
+    def __init__(self, id: Any, value: Any, is_selected: bool = False) -> None:
         super().__init__()
         self.__id = id
-        self.__is_selected = False
+        self.__value = value
+        self.__is_selected = is_selected
 
     @property
-    def id(self) -> int:
+    def id(self) -> Any:
         return self.__id
+    
+    @property
+    def value(self) -> Any:
+        return self.__value
     
     @property
     def is_selected(self) -> bool:
@@ -42,9 +47,10 @@ class ListItemCheckbox(IRightBodyTouch, MDCheckbox):
     The checkbox of the SelectableList item.
     '''
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, item: ListItem, **kwargs) -> None:
+        self.active = item.is_selected
+        self.__item = item
         super().__init__(**kwargs)
-        self.__item = None
 
     @property
     def item(self) -> ListItem:
@@ -62,11 +68,11 @@ class SelectableListItem(OneLineAvatarIconListItem):
     An item of the SelectableList.
     '''
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, item: ListItem, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.checkbox = ListItemCheckbox()
+        self.__item = item
+        self.checkbox = ListItemCheckbox(self.__item)
         self.add_widget(self.checkbox)
-        self.__item = None
 
     @property
     def item(self) -> ListItem:
@@ -91,14 +97,16 @@ class SelectableList(MDScrollView):
         self.add_widget(self.list_items)
 
     def add_item(self, text: str, item: ListItem):
-        viewItem = SelectableListItem(text=text)
+        # TODO: Проверять Item'ы по id
+
+        viewItem = SelectableListItem(item, text=text)
         viewItem.item = item
 
         self.list_items.add_widget(viewItem)
         self.__items_data.append(item)
 
     def get_selected_items(self) -> List[ListItem]:
-        return filter(lambda item: item.is_selected, self.__items_data)
+        return list(filter(lambda item: item.is_selected, self.__items_data))
     
 class ISaveableInputValue(ABC):
     '''

@@ -9,6 +9,7 @@ from kivymd.uix.pickers import MDDatePicker, MDTimePicker
 from views.shared_components import *
 from views.user_info_screen import *
 from views.add_stress_screen import *
+from views.add_nutritions_screen import *
 from data_storage.data_store import IndicatorsDataStorage
 
 KV = '''
@@ -232,34 +233,34 @@ MDScreen:
                     text: "Сохранить"
                     on_press: root.save_data()
 
-<AddNutritionsScreen>:
-    MDFlatButton:
-        text: "Выбрать дату"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
-        on_release: root.open_date_picker()
+# <AddNutritionsScreen>:
+#     MDFlatButton:
+#         text: "Выбрать дату"
+#         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+#         on_release: root.open_date_picker()
 
-    # SelectableList:
-    #     id: selectable_list
-    #     size_hint: 0.6, 1 
-    #     canvas.before:
-    #         Color:
-    #             rgba: 255, 0, 0, 1
-    #         Line:
-    #             width:
-    #             rectangle: self.x, self.y, self.width, self.height
+#     # SelectableList:
+#     #     id: selectable_list
+#     #     size_hint: 0.6, 1 
+#     #     canvas.before:
+#     #         Color:
+#     #             rgba: 255, 0, 0, 1
+#     #         Line:
+#     #             width:
+#     #             rectangle: self.x, self.y, self.width, self.height
 
-    MDTextField:
-        id: stress_level
-        hint_text: "Масса (в граммах)"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
-        input_filter: 'float'
-        size_hint_x: None
-        width: 300
+#     MDTextField:
+#         id: stress_level
+#         hint_text: "Масса (в граммах)"
+#         pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+#         input_filter: 'float'
+#         size_hint_x: None
+#         width: 300
         
-    MDFlatButton:
-        text: "Добавить запись"
-        pos_hint: {'center_x': 0.5, 'center_y': 0.4}
-        on_release: root.add_nutritions_entry()
+#     MDFlatButton:
+#         text: "Добавить запись"
+#         pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+#         on_release: root.add_nutritions_entry()
 
 <AddTrainingScreen>:
     MDFlatButton:
@@ -298,30 +299,14 @@ class AddMenstruationInfoScreen(MDScreen):
 
     def setup_widgets(self, dt):
         for i in range(30):
-            self.ids.selectable_list.add_item(f"Item {i}", ListItem(id=i))
+            self.ids.selectable_list.add_item(f"Item {i}", ListItem(id=i, value=i))
 
     def save_data(self):
         items = self.ids.selectable_list
         print(f'Selected Items:')
         for item in items.get_selected_items():
             print(f'Selected \'{item.id}\'.')
-
-class AddNutritionsScreen(MDScreen):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-    def open_date_picker(self) -> None:
-        date_dialog = MDDatePicker()
-        date_dialog.bind(on_save=self.get_date_of_picker)
-        date_dialog.open()
-
-    def get_date_of_picker(self, instance, value, date_range):
-        # Обработка выбранной даты
-        print("Выбранная дата:", value)
-
-    def add_nutritions_entry(self):
-        pass
-
+            
 class AddTrainingScreen(MDScreen):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
