@@ -1,12 +1,14 @@
 ﻿from kivymd.uix.screen import MDScreen
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.boxlayout import MDBoxLayout
-from views.shared_components import InputTextField, ListItem, SaveableInputInteger, DatePickerButton, SelectableList, SaveableInputString
+# from views.shared_components import InputTextField, ListItem, SaveableInputInteger, DatePickerButton, SelectableList, SaveableInputString
 from kivymd.app import MDApp
 from kivy.metrics import dp
 from typing import List
 from model.calories_module import CaloriesModule
+from kivy.properties import StringProperty
 from kivy.clock import Clock
+from views.shared_components import *
 
 '''
 <AddMenstruationInfoScreen>:
@@ -98,6 +100,12 @@ from kivy.clock import Clock
                     text: "Сохранить"
                     on_press: root.save_data()
 '''
+
+class RadioButtonWithText(MDBoxLayout):
+    label_text = StringProperty('')
+        
+class CheckBoxWithText(MDBoxLayout):
+    label_text = StringProperty('')
 
 class AddMenstruationInfoScreen(MDScreen):
     def __init__(self, *args, **kwargs):

@@ -1,8 +1,5 @@
 ﻿from kivy.lang import Builder
 from kivymd.app import MDApp
-from kivymd.uix.screen import MDScreen
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivy.properties import StringProperty
 from model.user import User
 from views.shared_components import *
 from views.user_info_screen import *
@@ -12,6 +9,7 @@ from views.add_training_screen import *
 from views.check_stress_screen import *
 from views.add_menstruation_info_screen import *
 from views.get_calorie_report_screen import *
+from views.menstruation_prediction_screen import *
 from data_storage.data_store import IndicatorsDataStorage
 
 KV = '''
@@ -106,7 +104,10 @@ MDScreen:
                 name: "scr_check_stress_screen"
 
             GetCalorieReportScreen:
-                name: "scr_get_calorie_report"
+                name: "scr_get_calorie_report_screen"
+
+            MenstruationPredictionScreen:
+                name: "scr_menstruation_prediction_screen"
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -164,7 +165,14 @@ MDScreen:
                     text: "Отчет по калориям"
                     on_press:
                         root.nav_drawer.set_state("close")
-                        root.screen_manager.current = "scr_get_calorie_report"
+                        root.screen_manager.current = "scr_get_calorie_report_screen"
+                        
+                DrawerClickableItem:
+                    icon: "calendar-alert"
+                    text: "Прогноз"
+                    on_press:
+                        root.nav_drawer.set_state("close")
+                        root.screen_manager.current = "scr_menstruation_prediction_screen"
 
 <AddMenstruationInfoScreen>:
     selectable_list: selectable_list
@@ -255,29 +263,9 @@ MDScreen:
                     text: "Сохранить"
                     on_press: root.save_data()
 '''
-    
-class AddMenstruationInfoScreen(MDScreen):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        Clock.schedule_once(self.setup_widgets)
 
-    def setup_widgets(self, dt):
-        for i in range(30):
-            self.ids.selectable_list.add_item(f"Item {i}", ListItem(id=i, value=i))
 
-    def save_data(self):
-        items = self.ids.selectable_list
-        print(f'Selected Items:')
-        for item in items.get_selected_items():
-            print(f'Selected \'{item.id}\'.')
-
-class RadioButtonWithText(MDBoxLayout):
-    label_text = StringProperty('')
-        
-class CheckBoxWithText(MDBoxLayout):
-    label_text = StringProperty('')
-
-class Example(MDApp):
+class Application(MDApp):
     def build(self):
         self.user = User('polina.vngrd', weight=56, height=169, age=20, sex=False)
         self.data_storage = IndicatorsDataStorage()
@@ -287,4 +275,4 @@ class Example(MDApp):
         return Builder.load_string(KV)
 
 
-Example().run()
+Application().run()
