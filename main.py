@@ -11,6 +11,12 @@ from views.user_info_screen import *
 
 
 KV = '''
+
+<IconListItem>
+
+    IconLeftWidget:
+        icon: root.icon
+
 <BoxLayoutBelowToolbar@MDBoxLayout>:
     orientation: 'vertical'
     pos_hint: {'top': 0.9}

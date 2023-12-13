@@ -8,6 +8,10 @@ from kivymd.uix.list import MDList
 from typing import List
 from abc import ABC, abstractmethod
 
+
+from kivymd.uix.list import OneLineIconListItem
+from kivy.properties import StringProperty
+
 class ListItem:
     '''
     The data of the SelectableList item.
@@ -148,6 +152,10 @@ class DropDownListItem:
     @property
     def title(self) -> str:
         return self.__title
+    
+
+class IconListItem(OneLineIconListItem):
+    icon = StringProperty()
 
 class DropDownList(MDDropDownItem):
     def __init__(self, items: List[DropDownListItem], *args, **kwargs) -> None:
@@ -159,8 +167,9 @@ class DropDownList(MDDropDownItem):
 
         menu_items = [
             {
+                "viewclass": "IconListItem",
                 "text": item.title,
-                "on_release": self.on_item_set,
+                "on_release": lambda x=item.title: self.on_item_set(x)
             } for item in items
         ]
 
@@ -168,6 +177,7 @@ class DropDownList(MDDropDownItem):
             caller=self,
             items=menu_items,
             position="center",
+            width_mult=4,
         )
 
         self.__menu.bind()
@@ -175,11 +185,6 @@ class DropDownList(MDDropDownItem):
     def on_release(self):
         self.__menu.open()
 
-    def set_item(self, text_item):
-        pass
-        # self.screen.ids.drop_item.set_item(text_item)
-        # self.menu.dismiss()
-
-    def on_item_set(self, *args):
-        self.set_item('aaa')
+    def on_item_set(self, text_item):
+        self.text = text_item
         self.__menu.dismiss()
