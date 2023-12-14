@@ -21,35 +21,6 @@ KV = '''
         Line:
             width:
             rectangle: self.x, self.y, self.width, self.height
-
-<IconListItem>
-
-    IconLeftWidget:
-        icon: root.icon
-
-<BoxLayoutBelowToolbar@MDBoxLayout>:
-    orientation: 'vertical'
-    pos_hint: {'top': 0.9}
-    size_hint: 1, 0.9
-
-<CheckBoxWithText@MDBoxLayout>:
-    orientation: 'horizontal'
-    canvas.before:
-        Color:
-            rgba: 255, 0, 0, 1
-        Line:
-            width:
-            rectangle: self.x, self.y, self.width, self.height
-
-    MDCheckbox:
-        id: checkbox
-        size_hint: 0.1, 1
-
-    MDLabel:
-        text: root.label_text
-        size_hint: 0.9, 1
-        halign: 'left'
-        valign: 'middle'
         
 <RadioButtonWithText@MDBoxLayout>:
     MDCheckbox:
@@ -181,95 +152,6 @@ MDScreen:
                     on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "scr_menstruation_prediction_screen"
-
-<AddMenstruationInfoScreen>:
-    selectable_list: selectable_list
-
-    BoxLayoutBelowToolbar:
-
-        MDStackLayout:
-            MDBoxLayout:
-                orientation: 'horizontal'
-                size_hint: 1, 0.1
-
-                CheckBoxWithText:
-                    size_hint: 0.4, 1
-                    label_text: 'Есть ли месячные?'
-
-                MDRaisedButton:
-                    text: 'Дата'
-                # MDDatePicker:
-                #     size_hint: 0.6, 1
-
-            MDBoxLayout:
-                size_hint: 1, 0.07   
-
-                MDLabel:    
-                    size_hint: 0.6, 1            
-                    halign: 'left'
-                    valign: 'middle'
-                    text: 'Симптомы'
-                    padding: dp(30)
-                    canvas.before:
-                        Color:
-                            rgba: 255, 0, 0, 1
-                        Line:
-                            width:
-                            rectangle: self.x, self.y, self.width, self.height
-                            
-                MDLabel:
-                    size_hint: 0.4, 1               
-                    padding: dp(20)
-                    halign: 'left'
-                    valign: 'middle'
-                    text: 'Настроение'
-                    canvas.before:
-                        Color:
-                            rgba: 255, 0, 0, 1
-                        Line:
-                            width:
-                            rectangle: self.x, self.y, self.width, self.height
-
-            MDBoxLayout:
-                orientation: 'horizontal'
-                size_hint: 1, 0.73 
-
-                SelectableList:
-                    id: selectable_list
-                    size_hint: 0.6, 1 
-                    canvas.before:
-                        Color:
-                            rgba: 255, 0, 0, 1
-                        Line:
-                            width:
-                            rectangle: self.x, self.y, self.width, self.height
-                
-                MDBoxLayout:
-                    size_hint: 0.4, 1 
-                    orientation: 'vertical'
-
-                    RadioButtonWithText:
-                        label_text: 'Веселое'
-                        active: True
-                        group: 'group'
-                    
-                    RadioButtonWithText:
-                        label_text: 'Спокойное'
-                        active: True
-                        group: 'group'
-                    
-                    RadioButtonWithText:
-                        label_text: 'Грустное'
-                        active: True
-                        group: 'group'
-
-            MDBoxLayout:
-                size_hint: 1, 0.1
-                padding: 10
-
-                MDRaisedButton:
-                    text: "Сохранить"
-                    on_press: root.save_data()
 '''
 
 
