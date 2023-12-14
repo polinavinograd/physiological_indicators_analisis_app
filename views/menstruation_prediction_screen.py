@@ -11,13 +11,12 @@ class MenstruationPredictionScreen(MDScreen):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        self.__next_sycle_label = MDLabel(text='Данных нет. Ожидайте', size_hint_y=None)
-        self.__next_sycle_label.font_size = "24sp"
+        self.__next_sycle_label = MDLabel(text='Данных нет. Ожидайте')
+        self.__next_sycle_label.font_size = "15sp"
 
         self.add_widget(MDBoxLayout(
-            MDScrollView(
-            self.__next_sycle_label),
-            orientation='vertical', padding=(dp(20), dp(60), dp(20), dp(20)), size_hint=(1, 0.9)))
+            self.__next_sycle_label,
+            orientation='vertical', size_hint=(1, 0.9), padding=(dp(20), dp(0), dp(20), dp(20))))
 
     def on_enter(self, *args):
         data_storage = MDApp.get_running_app().data_storage

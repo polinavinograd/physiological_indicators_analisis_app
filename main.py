@@ -14,13 +14,13 @@ from data_storage.data_store import IndicatorsDataStorage
 
 KV = '''
 
-<MDBoxLayout>:
-    canvas.before:
-        Color:
-            rgba: 255, 0, 0, 1
-        Line:
-            width:
-            rectangle: self.x, self.y, self.width, self.height
+# <MDBoxLayout>:
+#     canvas.before:
+#         Color:
+#             rgba: 243, 156, 18, 1
+#         Line:
+#             width:
+#             rectangle: self.x, self.y, self.width, self.height
         
 <RadioButtonWithText@MDBoxLayout>:
     MDCheckbox:
@@ -46,6 +46,7 @@ MDScreen:
 
     # Объявлен вне навигации, чтобы присутствовал на каждом экране
     MDTopAppBar:
+        id: top_bar
         pos_hint: {"top": 1}
         size_hint: 1, 0.1 
         elevation: 4

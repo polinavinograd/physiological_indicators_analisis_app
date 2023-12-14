@@ -124,7 +124,7 @@ class AddNutritionsScreen(MDScreen):
         save_button.bind(on_release=self.add_nutritions_entry)
 
         self.__date_picker = DatePickerButton(title='Выберите дату', pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        self.__ingredients_box = AddIngredientsBox()
+        self.__ingredients_box = AddIngredientsBox(pos_hint={'center_y': 0.5})
 
         self.add_widget(MDBoxLayout(
             self.__date_picker,
