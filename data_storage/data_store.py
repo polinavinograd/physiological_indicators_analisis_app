@@ -2,6 +2,7 @@ import os
 from datetime import date, time
 import sqlite3
 import pandas as pd
+from model.user import User
 
 from path import LOCAL_PATH
 
@@ -198,6 +199,23 @@ class IndicatorsDataStorage:
         query = 'SELECT * FROM Exercises'
         self.cursor.execute(query)
         return self.cursor.fetchall()
+    
+    def get_user(self, user_id: str) -> User:
+        get_query = "SELECT * FROM Users WHERE user_id = ?"
+        try:
+            self.cursor.execute(get_query, (user_id,))
+            existing_data = self.cursor.fetchone()
+            return User(
+                user_id=existing_data[0],
+                weight=existing_data[1],
+                height=existing_data[2],
+                age=existing_data[3],
+                sex=False,
+                brm=existing_data[4])
+
+        except sqlite3.Error as e:
+            print(f"Ошибка при извлечении пользователя: {e}")
+            return False
 
     def __user_exists(self, user_id: str) -> bool:
         existing_query = "SELECT 1 FROM Users WHERE user_id = ?"

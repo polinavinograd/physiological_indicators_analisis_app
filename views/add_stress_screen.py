@@ -47,9 +47,8 @@ class AddStressScreen(MDScreen):
         user_data = MDApp.get_running_app().user
         stress_module = StressModule(user_data, data_storage)
 
-        # TODO: не сохраняет
         stress_module.set_stress_level(
-            self.__stress_entry.strees_level.get_value(),
-            self.__date_picker.selected_date,
+            self.__stress_entry.strees_level.get_value().__str__(),
+            self.__date_picker.selected_date.__str__(),
             self.__time_picker.selected_time.__str__()
         )

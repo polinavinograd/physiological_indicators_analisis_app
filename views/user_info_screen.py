@@ -98,9 +98,16 @@ class UserInfoScreen(MDScreen):
             self.__gender_list.selected_item.value.value,
             self.__user_view_model.brm)
         
+        data_storage = MDApp.get_running_app().data_storage
+
+        user_data_dict = {"user_id": user_data.name,
+                     "weight": user_data.weight,
+                     "height": user_data.height,
+                     "age": user_data.age,
+                     "brm": user_data.brm}
+
+        data_storage.try_insert_user(user_data_dict)
         MDApp.get_running_app().user = user_data
-        
-        # TODO: Обновить данные пользователя в БД
 
     def __set_user_view(self, user_data: User) -> None:
         self.__user_view_model = UserViewModel()
