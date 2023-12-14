@@ -182,9 +182,22 @@ class IndicatorsDataStorage:
                 return True
             except sqlite3.Error as e:
                 print(f"Ошибка при вставке данных: {e}")
+                return False
+        else:
+            query = 'UPDATE Users SET weight = ?, height = ?, age = ?, brm = ? WHERE user_id = ?'
+            self.cursor.execute(query, (data['weight'], data['height'], data['age'], data['brm'], data['user_id']))
+            self.db_connection.commit()
+            return True
 
-        # TODO: обновить юзера
-        return False
+    def get_ingredients_list(self):
+        query = 'SELECT * FROM Ingredients'
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def get_exercises_list(self):
+        query = 'SELECT * FROM Exercises'
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
 
     def __user_exists(self, user_id: str) -> bool:
         existing_query = "SELECT 1 FROM Users WHERE user_id = ?"
@@ -227,6 +240,7 @@ class IndicatorsDataStorage:
         values = ', '.join('?' for _ in data.values())
         query = f"INSERT INTO UserStress ({columns}) VALUES ({values})"
         self.cursor.execute(query, tuple(data.values()))
+        self.db_connection.commit()
 
     def insert_menstruation_data(self, data: dict):
         existing_query = f"SELECT 1 FROM UserMenstruation WHERE user_id = ? AND date = ?"
