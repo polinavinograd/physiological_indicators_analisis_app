@@ -16,7 +16,12 @@ class MenstruationDelayModule:
         self.ds = ds
         self.current_cycle = [[{}]]
 
-        data = self.__form_training_data(self.__get_menstrual_info())[:10]
+        data = self.__form_training_data(self.__get_menstrual_info())
+        if len(data) == 0:
+            return
+        
+        data = data[:10]
+
         self.normal_cycle_length = min([el['cycle_length'] for el in data])
         X = self.__create_np_array(data)
         y = np.array([d['cycle_length'] for d in data])
@@ -90,6 +95,10 @@ class MenstruationDelayModule:
     def __form_temp_test_data(self, result_cycles: list[list[dict]]) -> list[dict]:
         cycles = []
         for cycle in result_cycles:
+
+            if len(cycle) == 0:
+                continue
+
             abdominal_pain_counter = self.__count_entries('abdominal_pain', 1, cycle)
             digestive_disorders_counter = self.__count_entries("digestive_disorders", 1, cycle)
             breast_pain_counter = self.__count_entries('breast_pain', 1, cycle)
@@ -119,6 +128,9 @@ class MenstruationDelayModule:
     # MAIN predict date
     def predict_menstruation(self) -> str:
         data = self.__form_temp_test_data(self.current_cycle)
+        if len(data) == 0:
+            return 'Нет данных'
+
         start_date = self.__get_start_date_of_cycle(self.current_cycle[0])
         data = self.__create_np_array(data)
         res_length = round(self.model.predict(data)[0])
@@ -130,6 +142,9 @@ class MenstruationDelayModule:
 
     def generate_report(self):
         data = self.__form_temp_test_data(self.current_cycle)
+        if len(data) == 0:
+            return 'Нет данных'
+        
         report = f'Прогнозируемая дата начала следующего цикла: {self.predict_menstruation()}.\n\n'
         report += f"В этом цикле вы: \n" \
                   f"   - чувствовали боль в животе: {data[0]['abdominal_pain']} р.;\n" \
@@ -157,6 +172,8 @@ class MenstruationDelayModule:
                   f"Средний стресс в течение этого цикла составил {data[0]['stress']}%. Кроме того, в этом месяце " \
                   f"значительное количество дней вы отмечали своё настроение как " \
                   f"{'хорошее' if data[0]['good_mood'] >= data[0]['bad_mood'] else 'подавленное'}."
+        
+        return report
 
 
     def set_menstruation_data(self, data: dict):

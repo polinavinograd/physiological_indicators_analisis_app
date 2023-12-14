@@ -276,7 +276,7 @@ MDScreen:
 class Application(MDApp):
     def build(self):
         self.data_storage = IndicatorsDataStorage()
-        self.user = self.data_storage.get_user('vadim')
+        self.user = self.data_storage.get_user('polina.vngrd')
 
         self.theme_cls.primary_palette = "Orange"
         self.theme_cls.theme_style = "Dark"
